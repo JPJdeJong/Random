@@ -4,25 +4,24 @@ Created on Fri Jan 22 21:59:02 2021
 
 @author: JP
 """
-
 import random
 import numpy as np
 import pandas as pd
 import os
 import xlsxwriter
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 
 cwd = os.getcwd()
 os.chdir(cwd)
-
-words  = ['Nice', 'Fantastic', 'Corona', 'Covid', 'Home Office', 'Resilient', 'Daycare',\
+words  = sorted(['Nice', 'Fantastic', 'Corona', 'Covid', 'Home Office', 'Resilient', 'Daycare',\
          'Trainees', 'Network', 'Plan', 'Horizon', 'Pushing', 'Employer', 'Professional', 'Consultant',\
          'We', 'Employee', 'Board', '2021', '2020', '2022', 'Goals', 'Target', 'Connect', 'Zoom', 'Internet',\
          'Talent', 'Mission', 'Vision','Remark', 'Tech', 'Personal', 'Ambition', 'IT','Agile', 'Epic', \
-         'Milestone', 'Bad connection']
-words = sorted(words)
-names = ['Rick', 'Roll', 'Never', 'Gonna', 'Give', 'You', 'Up']
+         'Milestone', 'Bad connection'])
+participants = ['Rick', 'Roll', 'Never', 'Gonna', 'Give', 'You', 'Up']
 
-print ('Amount contenders: '  + str(len(names)))
+print ('Amount participants: '  + str(len(participants)))
 print("Amount words: " + str(len(words)))
 print(cwd)
 
@@ -31,7 +30,7 @@ card_list = []
 while True:
     try:
         size_row = int(input("How many rows should the bingo card have? "))
-        size_col  = int(input("How many rows should the bingo card have?"))
+        size_col  = int(input("How many rows should the bingo card have? "))
         break
     except ValueError:
         #error handling if input is not a number, ask again.
@@ -40,6 +39,7 @@ while True:
 #make size of card.
 card_words_update = int(size_col * size_row) #necessary for random sample
 print((size_col, size_row), "Card Size = ", card_words_update)
+
 #make a card for every participant
 for i in names:
     try:
@@ -54,10 +54,9 @@ for i in names:
 writer = pd.ExcelWriter('Meeting_presentation_bingo.xlsx', engine='xlsxwriter')
 
 counter = 0
-
 for df in card_list:
-    df.to_excel(writer, index = 0, sheet_name = names[counter])
-    worksheet = writer.sheets[names[counter]]  # pull worksheet object
+    df.to_excel(writer, index = 0, sheet_name = participants[counter])
+    worksheet = writer.sheets[participants[counter]]  # pull worksheet object
     #update column width for card
     for idx, col in enumerate(df):  # loop through all columns
         series = df[col]
@@ -68,7 +67,16 @@ for df in card_list:
         worksheet.set_column(idx, idx, max_len)  # set column width
     counter+=1
 writer.save()
+print("\nCards are saved in the following folder:  \n\n" +str(cwd))
 
-print("\nCards are saved in the following folder:  \n\n"
-      +str(cwd)
-     )
+counter=0
+pp = PdfPages("Test.pdf")    
+for df in card_list:
+    fig, ax =plt.subplots(figsize=(12,4))
+    ax.axis('tight')
+    ax.axis('off')
+    the_table = ax.table(cellText=df.values,colLabels=df.columns,loc='center')
+    the_title = plt.title(participants[counter])
+    counter+=1
+    pp.savefig(fig, bbox_inches='tight')
+pp.close()
