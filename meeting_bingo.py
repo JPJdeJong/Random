@@ -67,10 +67,9 @@ for df in card_list:
         worksheet.set_column(idx, idx, max_len)  # set column width
     counter+=1
 writer.save()
-print("\nCards are saved in the following folder:  \n\n" +str(cwd))
 
 counter=0
-pp = PdfPages("Test.pdf")    
+pdf = PdfPages("Meeting_Bingo.pdf")    
 for df in card_list:
     fig, ax =plt.subplots(figsize=(12,4))
     ax.axis('tight')
@@ -78,5 +77,7 @@ for df in card_list:
     the_table = ax.table(cellText=df.values,colLabels=df.columns,loc='center')
     the_title = plt.title(participants[counter])
     counter+=1
-    pp.savefig(fig, bbox_inches='tight')
-pp.close()
+    pdf.savefig(fig, bbox_inches='tight')
+pdf.close()
+
+print("\n Cards (PDF and Excel) for your meeting bingo are saved in the following folder:  \n\n" +str(cwd))
